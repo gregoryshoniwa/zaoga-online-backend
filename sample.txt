@@ -1,0 +1,8 @@
+# Sample to generate the token
+{
+    "name": "generateToken",
+    "param": {
+        "email": "email@example.com",
+        "password": "password",
+    }
+}
