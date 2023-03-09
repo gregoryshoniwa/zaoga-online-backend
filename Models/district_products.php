@@ -14,6 +14,7 @@
 		function getName() { return $this->name; }
 		
 		
+		
 		public function __construct() {
 			$db = new DbConnect();
 			$this->dbConn = $db->connect();
