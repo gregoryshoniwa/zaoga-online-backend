@@ -109,13 +109,11 @@
 
 		public function insert() {
 			
-			$sql = 'INSERT INTO ' . $this->tableName . '(id, user_id, member_id, district_id,regional_id, district_product_id, currency,assembly_id, amount,form_id) VALUES(null, :user_id, :member_id, :district_id, :regional_id,:district_product_id,:currency,:assembly_id, :amount, :form_id)';
+			$sql = 'INSERT INTO ' . $this->tableName . '(id, user_id, member_id, district_product_id, currency,assembly_id, amount,form_id) VALUES(null, :user_id, :member_id, :district_product_id,:currency,:assembly_id, :amount, :form_id)';
 
 			$stmt = $this->dbConn->prepare($sql);
-			$stmt->bindParam(':user_id', $this->user_if);
+			$stmt->bindParam(':user_id', $this->user_id);
 			$stmt->bindParam(':member_id', $this->member_id);
-			$stmt->bindParam(':district_id', $this->district_id);
-			$stmt->bindParam(':regional_id', $this->regional_id);
 			$stmt->bindParam(':district_product_id', $this->district_product_id);
 			$stmt->bindParam(':currency', $this->currency);
 			$stmt->bindParam(':assembly_id', $this->assembly_id);

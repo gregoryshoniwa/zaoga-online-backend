@@ -6,18 +6,16 @@ trait DistrictTransactionsApis {
     public function addDistrictTransaction() {
         $user_id = $this->validateParameter('user_id', $this->param['user_id'], INTEGER, false);
         $member_id = $this->validateParameter('member_id', $this->param['member_id'], INTEGER, false);
-        $district_id = $this->validateParameter('district_id', $this->param['district_id'], INTEGER, false);
         $district_product_id = $this->validateParameter('district_product_id', $this->param['district_product_id'], INTEGER, false);
         $currency = $this->validateParameter('currency', $this->param['currency'], STRING, false);
         $assembly_id = $this->validateParameter('assembly_id', $this->param['assembly_id'], INTEGER, false);
-        $amount = $this->validateParameter('amount', $this->param['amount'], DOUBLE, false);
+        $amount = $this->validateParameter('amount', $this->param['amount'], STRING, false);
         $form_id = $this->validateParameter('form_id', $this->param['form_id'], STRING, false);
        
 
         $cust = new DistrictTransactions;
         $cust->setUserId($user_id);
         $cust->setMemberId($member_id);
-        $cust->setDistrictId($district_id);
         $cust->setDistrictProductId($district_product_id);
         $cust->setCurrency($currency);
         $cust->setAssemblyId($assembly_id);

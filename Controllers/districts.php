@@ -3,7 +3,7 @@
 include dirname(__FILE__).'/../Models/districts.php';
 trait DistrictApis {
      
-    public function addAssembly() {
+    public function addDistrict() {
         $name = $this->validateParameter('name', $this->param['name'], STRING, false);
         $province = $this->validateParameter('province_id', $this->param['province_id'], INTEGER, false);
         $national = $this->validateParameter('national_id', $this->param['national_id'], INTEGER, false);
