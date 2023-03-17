@@ -48,17 +48,17 @@ trait DistrictTransactionsApis {
         $this->returnResponse(SUCCESS_RESPONSE, $user);
     }
 
-    public function getAllDistrictTransactionsById() {
+    public function getAllDistrictTransactionsByFormId() {
         $form_id = $this->validateParameter('form_id', $this->param['form_id'], STRING);
 
         $cust = new DistrictTransactions;
-        $cust->setId($form_id);
+        $cust->setFormId($form_id);
         $form = $cust->getDistrictTransactionsById();
         if(!is_array($form)) {
             $this->returnResponse(SUCCESS_WARNING, ['message' => 'Form details not found.']);
         }
 
-        $this->returnResponse(SUCCESS_RESPONSE, $member);
+        $this->returnResponse(SUCCESS_RESPONSE, $form);
     }
 
     public function updateDistrictTransaction() {

@@ -49,24 +49,22 @@
 		
 		public function getDistrictTransactionsById() {
  
-			$sql = "SELECT d.id,u.username AS assembly_secretary,CONCAT((SELECT p.position FROM positions p WHERE id = m.position),' : ', m.firstName,' ',m.lastName) AS member,dd.name AS district,
-					r.name AS region,a.name AS assembly,dp.name AS district_product,c.code AS currency,d.amount,d.form_id,
+			$sql = "SELECT d.id,u.username AS assembly_secretary,CONCAT((SELECT p.position FROM positions p WHERE id = m.position),' : ', m.firstName,' ',m.lastName) AS member,
+					a.name AS assembly,dp.name AS district_product,c.code AS currency,d.amount,d.form_id,
 					ru.username AS office_secretary,d.created_on,d.recieved_on
 					FROM district_transactions d
-					INNER JOIN assembles a ON d.assembly_id = a.id
+					INNER JOIN assemblies a ON d.assembly_id = a.id
 					INNER JOIN members m ON d.member_id = m.id
 					INNER JOIN users u ON d.user_id = u.id
 					LEFT JOIN users ru ON d.recieved_by = ru.id
-					INNER JOIN districts dd ON d.district_id = dd.id 
 					INNER JOIN district_products dp ON d.district_product_id = dp.id
 					INNER JOIN currencies c ON d.currency = c.id
-					INNER JOIN regions r ON d.regional_id = r.id
-					WHERE d.form_id = :formId";
+					WHERE d.form_id = :formId and d.banked = '0'";
 			
 			$stmt = $this->dbConn->prepare($sql);
 			$stmt->bindParam(':formId', $this->form_id);
 			$stmt->execute();
-			$member = $stmt->fetch(PDO::FETCH_ASSOC);
+			$member = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			return $member;
 		}
 

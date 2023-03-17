@@ -50,7 +50,7 @@
 
 		public function getAllMembers() {
 			$stmt = $this->dbConn->prepare("SELECT m.id,m.firstName,m.lastName,m.national_id,a.name AS assembly_name,p.position,m.created_on,u.username FROM members m
-					INNER JOIN assembles a ON m.assembly_id = a.id
+					INNER JOIN assemblies a ON m.assembly_id = a.id
 					INNER JOIN positions p ON m.position = p.id
 					INNER JOIN users u ON m.created_by = u.id");
 			$stmt->execute();
@@ -61,7 +61,7 @@
 		public function getMemberDetailsById() {
  
 			$sql = "SELECT m.id,m.firstName,m.lastName,g.gender_code,m.gender,m.position as position_id,m.active,m.national_id,a.name AS assembly_name,p.position,m.created_on,u.username as created_by,m.updated_on,u2.username as updated_by FROM members m
-					LEFT JOIN assembles a ON m.assembly_id = a.id
+					LEFT JOIN assemblies a ON m.assembly_id = a.id
 					INNER JOIN positions p ON m.position = p.id
 					INNER JOIN users u ON m.created_by = u.id
 					INNER JOIN gender g ON m.gender = g.id
@@ -90,7 +90,7 @@
 			// Query to fetch users
 			
 			$sql = "SELECT m.id,m.firstName,m.lastName,g.gender_code,m.gender,m.position as position_id,m.active,m.national_id,a.name AS assembly_name,p.position,m.created_on,u.username as created_by,m.updated_on,u2.username as updated_by FROM members m
-					LEFT JOIN assembles a ON m.assembly_id = a.id
+					LEFT JOIN assemblies a ON m.assembly_id = a.id
 					INNER JOIN positions p ON m.position = p.id
 					INNER JOIN users u ON m.created_by = u.id
 					INNER JOIN gender g ON m.gender = g.id
