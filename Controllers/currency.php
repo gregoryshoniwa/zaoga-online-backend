@@ -37,7 +37,7 @@ trait CurrencyApis {
     }
 
     public function getCurrencyById() {
-        $currency_id = $this->validateParameter('currency_id', $this->param['currency_id'], INTEGER);
+        $currency_id = $this->validateParameter('currency_id', $this->param['currency_id'], INTEGER,true);
 
         $cust = new Currency;
         $cust->setId($currency_id);

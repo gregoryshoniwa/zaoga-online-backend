@@ -4,6 +4,7 @@
 		private $name;
 		private $code;
 		private $symbol;
+		private $country;
 		
 		private $tableName = 'currencies';
 		private $dbConn;
@@ -16,6 +17,8 @@
 		function getCode() { return $this->code; }
 		function setSymbol($symbol) { $this->symbol = $symbol; }
 		function getSymbol() { return $this->symbol; }
+		function setCountry($country) { $this->country = $country; }
+		function getCountry() { return $this->country; }
 		
 		public function __construct() {
 			$db = new DbConnect();
@@ -23,7 +26,9 @@
 		}
 
 		public function getAllCurrencies() {
-			$stmt = $this->dbConn->prepare("SELECT * FROM currencies");
+			$stmt = $this->dbConn->prepare("SELECT c.id, c.name, c.symbol, c.code, ct.name AS country
+			FROM currencies AS c
+			JOIN countries AS ct ON c.country = ct.id");
 			$stmt->execute();
 			$members = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			return $members;
@@ -31,7 +36,10 @@
 
 		public function getCurrencyDetailsById() {
 
-			$sql = "SELECT * FROM currencies c WHERE c.id = :currency_id";
+			$sql = "SELECT c.id, c.name, c.symbol, c.code, ct.name AS country
+			FROM currencies AS c
+			JOIN countries AS ct ON c.country = ct.id 
+			WHERE c.id = :currency_id";
 			
 			$stmt = $this->dbConn->prepare($sql);
 			$stmt->bindParam(':currency_id', $this->id);

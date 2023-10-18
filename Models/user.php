@@ -1,11 +1,11 @@
-<?php 
-	class User {
+<?php  
+	class User { 
 		private $id;
 		private $page;
 		private $firstName;
 		private $lastName;
 		private $username;
-		private $authorizations;
+		private $company;
 		private $gender;
 		private $password;
 		private $new_password;
@@ -30,8 +30,8 @@
 		function getUserName() { return $this->username; }
 		function setGender($gender) { $this->gender = $gender; }
 		function getGender() { return $this->gender; }
-		function setAuthorizations($authorizations) { $this->authorizations = $authorizations; }
-		function getAuthorizations() { return $this->authorizations; }
+		function setCompany($company) { $this->company = $company; }
+		function getCompany() { return $this->company; }
 		function setPassword($password) { $this->password = $password; }
 		function getPassword() { return $this->password; }
 		function setNewPassword($new_password) { $this->new_password = $new_password; }
@@ -55,7 +55,7 @@
 		}
 
 		public function getAllUsers() {
-			$stmt = $this->dbConn->prepare("SELECT u.id,u.firstName,u.lastName,u.username,u.active,u.created_on,u2.username as created_by,u.updated_on,u3.username as updated_by,u.assembly_id FROM users u
+			$stmt = $this->dbConn->prepare("SELECT u.id,u.first_name,u.last_name,u.user_name,u.active,u.created_on,u2.user_name as created_by,u.updated_on,u3.user_name as updated_by FROM users u
 					INNER JOIN users u2 ON u.created_by = u2.id
 					LEFT JOIN users u3 ON u.updated_by = u3.id");
 			$stmt->execute();
@@ -65,7 +65,7 @@
 
 		public function getUserDetailsById() {
 
-			$sql = "SELECT u.id,u.firstName,u.lastName,u.username,u.authorizations,g.gender_code,u.gender,u.active,u.created_on,u2.username as created_by,u.updated_on,u3.username as updated_by,u.assembly_id FROM users u
+			$sql = "SELECT u.id,u.first_name,u.last_name,u.user_name,u.company,g.code,u.gender,u.active,u.created_on,u2.user_name as created_by,u.updated_on,u3.user_name as updated_by FROM users u
 					INNER JOIN users u2 ON u.created_by = u2.id
 					INNER JOIN gender g ON u.gender = g.id
 					LEFT JOIN users u3 ON u.updated_by = u3.id 
@@ -92,9 +92,10 @@
 			
 			// Query to fetch users
 			
-			$sql = "SELECT u.id,u.firstName,u.lastName,u.username,u.authorizations,g.gender_code,u.gender,u.active,u.created_on,u2.username as created_by,u.updated_on,u3.username as updated_by,u.assembly_id FROM users u
+			$sql = "SELECT u.id,u.first_name,u.last_name,u.user_name,c.name as company,g.code,u.gender,u.active,u.created_on,u2.user_name as created_by,u.updated_on,u3.user_name as updated_by FROM users u
 					INNER JOIN users u2 ON u.created_by = u2.id
 					INNER JOIN gender g ON u.gender = g.id
+					INNER JOIN company c ON u.company = c.id
 					LEFT JOIN users u3 ON u.updated_by = u3.id
 					ORDER BY id DESC LIMIT $starting_limit,$perPage";
 		
@@ -118,16 +119,17 @@
 
 		public function insert() {
 			
-			$sql = 'INSERT INTO ' . $this->tableName . '(id, firstName, lastName, username,gender, authorizations, password, created_by) VALUES(null, :firstName, :lastName, :username, :gender, :authorizations, :password, :createdBy)';
+			$sql = 'INSERT INTO ' . $this->tableName . '(id, first_name, last_name, user_name,gender,company, active, password, created_by) VALUES(null, :first_name, :last_name, :user_name, :gender,:company, :active, :password, :created_by)';
 
 			$stmt = $this->dbConn->prepare($sql);
-			$stmt->bindParam(':firstName', $this->firstName);
-			$stmt->bindParam(':lastName', $this->lastName);
-			$stmt->bindParam(':username', $this->username);
+			$stmt->bindParam(':first_name', $this->firstName);
+			$stmt->bindParam(':last_name', $this->lastName);
+			$stmt->bindParam(':user_name', $this->username);
 			$stmt->bindParam(':gender', $this->gender);
-			$stmt->bindParam(':authorizations', $this->authorizations);
+			$stmt->bindParam(':company', $this->company);
+			$stmt->bindParam(':active', $this->active);
 			$stmt->bindParam(':password', $this->password);
-			$stmt->bindParam(':createdBy', $this->createdBy);
+			$stmt->bindParam(':created_by', $this->createdBy);
 				
 			
 			if($stmt->execute()) {
@@ -141,19 +143,19 @@
 			
 			$sql = "UPDATE $this->tableName SET";
 			if( null != $this->getFirstName()) {
-				$sql .=	" firstName = '" . $this->getFirstName() . "',";
+				$sql .=	" first_name = '" . $this->getFirstName() . "',";
 			}
 
 			if( null != $this->getLastName()) {
-				$sql .=	" lastName = '" . $this->getLastName() . "',";
+				$sql .=	" last_name = '" . $this->getLastName() . "',";
 			}
 			
 			if( null != $this->getUserName()) {
-				$sql .=	" username = '" . $this->getUserName() . "',";
+				$sql .=	" user_name = '" . $this->getUserName() . "',";
 			}
 
-			if( null != $this->getAuthorizations()) {
-				$sql .=	" authorizations = '" . $this->getAuthorizations() . "',";
+			if( null != $this->getCompany()) {
+				$sql .=	" company = '" . $this->getCompany() . "',";
 			}
 
 			if( null != $this->getGender()) {

@@ -20,13 +20,18 @@
 			$this->dbConn = $db->connect();
 
 			if( 'generatetoken' != strtolower( $this->serviceName) ) {
-				$this->validateToken();
+				$this->validateToken($_SERVER['HTTP_API_TYPE']);
 			}
 		}
 
 		Public function validateRequest() {
+			
 			if($_SERVER['CONTENT_TYPE'] !== 'application/json') {
 				$this->throwError(REQUEST_CONTENTTYPE_NOT_VALID, 'Request content type is not valid');
+			}
+
+			if(!isset($_SERVER['HTTP_API_TYPE']) || ($_SERVER['HTTP_API_TYPE'] !== "general" && $_SERVER['HTTP_API_TYPE'] !== "live_integration" && $_SERVER['HTTP_API_TYPE'] !== "dev_integration")) {
+				$this->throwError(REQUEST_API_TYPE_NOT_VALID, 'Request header api-type is not valid. Please set either general or integration');
 			}
 
 			$data = json_decode($this->request, true);
@@ -43,9 +48,14 @@
 		}
 
 		public function validateParameter($fieldName, $value, $dataType, $required = true) {
-			if($required == true && empty($value) == true) {
+			if($required == true && empty($value) == true && $value != "0") {
 				$this->throwError(VALIDATE_PARAMETER_REQUIRED, $fieldName . " parameter is required.");
 			}
+				
+			if (!isset($this->param[$fieldName])) {
+				$this->throwError(VALIDATE_PARAMETER_REQUIRED, $fieldName ." parameter is missing.");
+			} 
+			
 
 			switch ($dataType) {
 				case BOOLEAN:
@@ -74,23 +84,59 @@
 
 		}
 
-		public function validateToken() {
+		public function validateToken($api_type) {
 			try {
 				$token = $this->getBearerToken();
-				$payload = JWT::decode($token, SECRETE_KEY, ['HS256']);
+				if($api_type == "general"){
+					$payload = JWT::decode($token, SECRETE_KEY, ['HS256']);
 
-				$stmt = $this->dbConn->prepare("SELECT * FROM users WHERE id = :userId");
-				$stmt->bindParam(":userId", $payload->user->id);
-				$stmt->execute();
-				$user = $stmt->fetch(PDO::FETCH_ASSOC);
-				if(!is_array($user)) {
-					$this->returnResponse(INVALID_USER_PASS, "This user is not found in our database.");
+					$stmt = $this->dbConn->prepare("SELECT * FROM users WHERE id = :userId");
+					$stmt->bindParam(":userId", $payload->user->id);
+					$stmt->execute();
+					$user = $stmt->fetch(PDO::FETCH_ASSOC);
+					if(!is_array($user)) {
+						$this->returnResponse(INVALID_USER_PASS, "This user is not found in our database.");
+					}
+
+					if( $user['active'] == 0 ) {
+						$this->returnResponse(USER_NOT_ACTIVE, "This user may be decactived. Please contact to admin.");
+					}
+					$this->userId = $payload->user->id;
+				}
+				if($api_type == "dev_integration"){
+					
+					$stmt = $this->dbConn->prepare("SELECT c.id,c.active,cs.live_secret,cs.dev_secret FROM customers c INNER JOIN customer_secrets cs ON cs.customer_id = c.id WHERE c.user_name = :user_name");
+					$stmt->bindParam(":user_name", $_SERVER['HTTP_USER_NAME']);
+					$stmt->execute();
+					$user = $stmt->fetch(PDO::FETCH_ASSOC);
+					if(!is_array($user)) {
+						$this->returnResponse(INVALID_USER_PASS, "This user is not found in our database.");
+					}
+
+					if( $user['active'] == 0 ) {
+						$this->returnResponse(USER_NOT_ACTIVE, "This user may be decactived. Please contact to admin.");
+					}
+					$payload = JWT::decode($token, $user['dev_secret'], ['HS256']);
+					$this->userId = $payload->user->id;
+				}
+				if($api_type == "live_integration"){
+					
+					$stmt = $this->dbConn->prepare("SELECT c.id,c.active,cs.live_secret,cs.dev_secret FROM customers c INNER JOIN customer_secrets cs ON cs.customer_id = c.id WHERE c.user_name = :user_name");
+					$stmt->bindParam(":user_name", $_SERVER['HTTP_USER_NAME']);
+					$stmt->execute();
+					$user = $stmt->fetch(PDO::FETCH_ASSOC);
+					if(!is_array($user)) {
+						$this->returnResponse(INVALID_USER_PASS, "This user is not found in our database.");
+					}
+
+					if( $user['active'] == 0 ) {
+						$this->returnResponse(USER_NOT_ACTIVE, "This user may be decactived. Please contact to admin.");
+					}
+					$payload = JWT::decode($token, $user['live_secret'], ['HS256']);
+					$this->userId = $payload->user->id;
 				}
 
-				if( $user['active'] == 0 ) {
-					$this->returnResponse(USER_NOT_ACTIVE, "This user may be decactived. Please contact to admin.");
-				}
-				$this->userId = $payload->user->id;
+				
 			} catch (Exception $e) {
 				$this->throwError(ACCESS_TOKEN_ERRORS, $e->getMessage());
 			}
@@ -104,8 +150,19 @@
 					$this->throwError(API_DOST_NOT_EXIST, "API does not exist.");
 				}
 				$rMethod->invoke($api);
+			} catch (PDOException $e) {
+				// Access the error information
+				$errorInfo = $e->errorInfo;
+				
+				// Customize the error message using the errorInfo array
+				$customErrorMessage = "Database Error: " . $errorInfo[2]; // The third element contains the error message
+				
+				$this->throwError(API_DOST_NOT_EXIST, $customErrorMessage);
+			
 			} catch (Exception $e) {
-				$this->throwError(API_DOST_NOT_EXIST, "API does not exist.");
+				// $this->throwError(API_DOST_NOT_EXIST, $e->message);
+				$customErrorMessage = "An error occurred: " . $e->getMessage();
+        		$this->throwError(API_DOST_NOT_EXIST, $customErrorMessage);
 			}
 			
 		}
@@ -155,5 +212,6 @@
 	        }
 	        $this->throwError( ATHORIZATION_HEADER_NOT_FOUND, 'Access Token Not found');
 	    }
+
 	}
  ?>

@@ -1,24 +1,26 @@
 <?php  
-
+ 
 include dirname(__FILE__).'/../Models/user.php';
 trait UserApis {
     
     public function addUser() {
-        $firstName = $this->validateParameter('firstName', $this->param['firstName'], STRING, false);
-        $lastName = $this->validateParameter('lastName', $this->param['lastName'], STRING, false);
-        $password = $this->validateParameter('password', $this->param['password'], STRING, false);
-        $username = $this->validateParameter('userName', $this->param['userName'], STRING, false);
-        $authorizations = $this->validateParameter('authorizations', $this->param['authorizations'], STRING, false);
-        $gender = $this->validateParameter('gender', $this->param['gender'], STRING, false);
-        $created_by = $this->validateParameter('created_by', $this->param['created_by'], INTEGER, false);
+        $firstName = $this->validateParameter('first_name', $this->param['first_name'], STRING, true);
+        $lastName = $this->validateParameter('last_name', $this->param['last_name'], STRING, true);
+        $password = $this->validateParameter('password', $this->param['password'], STRING, true);
+        $username = $this->validateParameter('user_name', $this->param['user_name'], STRING, true);
+        $active = $this->validateParameter('active', $this->param['active'], INTEGER, true);
+        $gender = $this->validateParameter('gender', $this->param['gender'], INTEGER, true);
+        $company = $this->validateParameter('company', $this->param['company'], INTEGER, true);
+        $created_by = $this->validateParameter('created_by', $this->param['created_by'], INTEGER, true);
        
 
         $cust = new User;
         $cust->setFirstName($firstName);
         $cust->setLastName($lastName);
         $cust->setUserName($username);
-        $cust->setAuthorizations($authorizations);
+        $cust->setActive($active);
         $cust->setGender($gender);
+        $cust->setCompany($company);
         $cust->setPassword(password_hash($password,PASSWORD_BCRYPT)); 
         $cust->setCreatedBy($created_by);
        
@@ -74,19 +76,19 @@ trait UserApis {
 
     public function updateUser() {
         $userId = $this->validateParameter('userId', $this->param['userId'], INTEGER);
-        $firstName = $this->validateParameter('firstName', $this->param['firstName'], STRING, false);
-        $lastName = $this->validateParameter('lastName', $this->param['lastName'], STRING, false);
-        $username = $this->validateParameter('userName', $this->param['userName'], STRING, false);
-        $authorizations = $this->validateParameter('authorizations', $this->param['authorizations'], STRING, false);
-        $gender = $this->validateParameter('gender', $this->param['gender'], STRING, false);
-        $updated_by = $this->validateParameter('updated_by', $this->param['updated_by'], INTEGER, false);
+        $firstName = $this->validateParameter('firstName', $this->param['firstName'], STRING, true);
+        $lastName = $this->validateParameter('lastName', $this->param['lastName'], STRING, true);
+        $username = $this->validateParameter('userName', $this->param['userName'], STRING, true);
+        $company = $this->validateParameter('company', $this->param['company'], STRING, true);
+        $gender = $this->validateParameter('gender', $this->param['gender'], STRING, true);
+        $updated_by = $this->validateParameter('updated_by', $this->param['updated_by'], INTEGER, true);
 
         $cust = new User;
         $cust->setId($userId);
         $cust->setFirstName($firstName);
         $cust->setLastName($lastName);
         $cust->setUserName($username);
-        $cust->setAuthorizations($authorizations);
+        $cust->setCompany($company);
         $cust->setGender($gender);
         $cust->setUpdatedBy($updated_by);
 
@@ -109,10 +111,10 @@ trait UserApis {
         
     }
 
-    public function updateStatus() {
-        $userId = $this->validateParameter('userId', $this->param['userId'], INTEGER);
-        $active = $this->validateParameter('active', $this->param['active'], INTEGER, false);
-        $updated_by = $this->validateParameter('updated_by', $this->param['updated_by'], INTEGER, false);
+    public function updateUserStatus() {
+        $userId = $this->validateParameter('userId', $this->param['userId'], INTEGER,true);
+        $active = $this->validateParameter('active', $this->param['active'], INTEGER, true);
+        $updated_by = $this->validateParameter('updated_by', $this->param['updated_by'], INTEGER, true);
 
         $cust = new User;
         $cust->setId($userId);
@@ -148,9 +150,9 @@ trait UserApis {
     }
 
 
-    public function restPassword() {
-        $userId = $this->validateParameter('userId', $this->param['userId'], INTEGER);
-        $updated_by = $this->validateParameter('updated_by', $this->param['updated_by'], INTEGER, false);
+    public function restPasswordUser() {
+        $userId = $this->validateParameter('userId', $this->param['userId'], INTEGER,true);
+        $updated_by = $this->validateParameter('updated_by', $this->param['updated_by'], INTEGER, true);
         
         $cust = new User;
         $cust->setId($userId);
@@ -176,10 +178,10 @@ trait UserApis {
         
     }
 
-    public function changePassword() {
+    public function changeUserPassword() {
         $userId = $this->validateParameter('userId', $this->param['userId'], INTEGER);
-        $old_password = $this->validateParameter('old_password', $this->param['old_password'], STRING, false);
-        $new_password = $this->validateParameter('new_password', $this->param['new_password'], STRING, false);
+        $old_password = $this->validateParameter('oldPassword', $this->param['oldPassword'], STRING, true);
+        $new_password = $this->validateParameter('newPassword', $this->param['newPassword'], STRING, true);
         
         $cust = new User;
         $cust->setId($userId);

@@ -4,7 +4,7 @@
 	*/
 	class DbConnect {
 		private $server = 'localhost';
-		private $dbname = 'zaoga_online';
+		private $dbname = 'norah_gateway';
 		private $user = 'root';
 		private $pass = 'JesusChrist@@11';
 
